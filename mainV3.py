@@ -5,6 +5,7 @@ Tuned for better performance and with removing all dirty data (non english/latin
 See notebooks/unsplash_v2.ipnyb for results
 """
 import pandas as pd
+import numpy as np
 import unicodedata
 import re
 import os
@@ -111,7 +112,10 @@ new_df = new_df.rename(columns={
 })
 
 _print("Saving new file to " + os.getcwd() + "/data/export/photos_data.tsv")
-new_df.to_csv('./data/export/photos_data.tsv', sep='\t', index=False)
+chunks = np.array_split(new_df, 25)
+for i, chunk in enumerate(chunks):
+    pd_chunk = pd.DataFrame(chunk)
+    pd_chunk.to_csv(f'./data/export/photos_data_{i}.tsv', sep='\t', index=False)
 
 finished = time.time() - start_time
 _print("Execution time: " + str(round(finished)) + " seconds")
